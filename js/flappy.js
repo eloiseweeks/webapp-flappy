@@ -12,7 +12,7 @@ var score = 0;
 var labelScore;
 var player;
 var pipes = [];
-var pipeInterval = 1.4;
+var pipeInterval = 1.1;
 var gapSize = 100;
 var gapMargin = 50;
 var blockHeight = 50;
@@ -20,6 +20,9 @@ var balloons = [];
 var weights = [];
 var width = 790;
 var height = 400;
+var gameGravity = 230;
+var lives = 3;
+var labelLives;
 
 
 jQuery("#greeting-form").on("submit", function(event_details) {
@@ -64,20 +67,20 @@ $.get("/score", function(scores) {
 
     function create() {
 
-        game.stage.setBackgroundColor("000000");
-        game.add.text(40, 30, "Welcome to my game!",
-            {font: "25px Times New Roman", fill: "#FFFFFF"});
-        labelScore = game.add.text(700, 20, "0");
+        game.stage.setBackgroundColor("#FAEBD7");
+        labelScore = game.add.text(20, 20, "0");
+        labelLives = game.add.text(120,360, "3");
+        game.add.text(20,360,"Lives:");
         player = game.add.sprite(100, 200, "playerImg");
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.physics.arcade.enable(player);
         // set the player's gravity
-        player.body.gravity.y = 230;
+        player.body.gravity.y = gameGravity;
         // associate spacebar with jump function
         game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(playerJump);
         game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
         player.anchor.setTo(0.5, 0.5);
-
+        game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(moveDown);
     }
 
     function addPipeBlock(x, y) {
@@ -95,15 +98,15 @@ $.get("/score", function(scores) {
                 addPipeBlock(750, count * 50);
             }
         }
-        changeScore();
+        changeScore(1);
     }
 
     function playerJump() {
         player.body.velocity.y = -180;
     }
 
-    function changeScore() {
-        score++;
+    function changeScore(scoredifference) {
+        score = score + scoredifference;
         labelScore.setText(score.toString());
     }
 function changeGravity(g) {
@@ -117,18 +120,23 @@ function generateBalloons(){
     bonus.body.velocity.x = - 200;
     bonus.body.velocity.y = - game.rnd.integerInRange(60,100);
 }
+
 function generateWeights(){
-    var bonus = game.add.sprite(width, height, "weights");
+    var bonus = game.add.sprite(width, 0, "weights");
     weights.push(bonus);
     game.physics.arcade.enable(bonus);
     bonus.body.velocity.x = - 200;
-    bonus.body.velocity.y = game.rnd.integerInRange(60,100);
+    bonus.body.velocity.y =  game.rnd.integerInRange(40,70);
 }
+function moveDown() {
+    player.y = player.y + 30
+}
+
 function generate() {
     var diceRoll = game.rnd.integerInRange(1, 10);
     if(diceRoll==1) {
         generateBalloons();
-    } else if(diceRoll==2) {
+    } else if(diceRoll==2 || diceRoll==3) {
         generateWeights();
     } else {
         generatePipe();
@@ -141,6 +149,19 @@ function generate() {
         gameGravity = 200;
     }
 
+function checkBonus(bonusArray, scoredifference){
+    for(var i=bonusArray.length - 1; i>=0; i--){
+        game.physics.arcade.overlap(player,bonusArray[i], function(){
+            changeScore(scoredifference);
+            bonusArray[i].destroy();
+            bonusArray.splice(i,1);
+        });
+    }
+}
+function loseALife() {
+
+    labelLives.setText(lives.toString());
+}
 
     function update() {
         game.physics.arcade
@@ -152,5 +173,13 @@ function generate() {
             gameOver();
         }
         player.rotation = Math.atan(player.body.velocity.y / 200);
+        checkBonus(balloons, 3);
+        checkBonus(weights, -5);
+        if(score < 0){
+            gameOver();
+        }
+        if(lives<0) {
+            gameOver();
+        }
     }
 
