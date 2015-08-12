@@ -11,6 +11,7 @@ app.get('/', function(request, response) {
     response.sendFile(path.join(__dirname, 'pages/index.html'))
 });
 
+
 app.get("/score", function(request, response) {
     var reader = csv.createCsvFileReader("scores.csv");
     reader.setColumnNames(['name', 'email', 'score']);
