@@ -16,6 +16,11 @@ var pipeInterval = 1.4;
 var gapSize = 100;
 var gapMargin = 50;
 var blockHeight = 50;
+var balloons = [];
+var weights = [];
+var width = 790;
+var height = 400;
+
 
 jQuery("#greeting-form").on("submit", function(event_details) {
     event_details.preventDefault();
@@ -52,7 +57,8 @@ $.get("/score", function(scores) {
         game.load.image("playerImg", "../assets/flappy_frog.png");
         game.load.audio("score", "../assets/point.ogg");
         game.load.image("pipe", "../assets/pipe_mint.png");
-        game.load.image("balloon")
+        game.load.image("balloons", "../assets/balloons.png");
+        game.load.image("weights", "../assets/weight.png");
     }
 
 
@@ -69,7 +75,7 @@ $.get("/score", function(scores) {
         player.body.gravity.y = 230;
         // associate spacebar with jump function
         game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(playerJump);
-        game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generatePipe);
+        game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
         player.anchor.setTo(0.5, 0.5);
 
     }
@@ -100,10 +106,33 @@ $.get("/score", function(scores) {
         labelScore.setText(score.toString());
     }
 function changeGravity(g) {
-    gameGravity += g;                    1
-    player.body.gravity.y = gameGravity; 2
+    gameGravity += g;
+    player.body.gravity.y = gameGravity;
 }
-
+function generateBalloons(){
+    var bonus = game.add.sprite(width, height, "balloons");
+    balloons.push(bonus);
+    game.physics.arcade.enable(bonus);
+    bonus.body.velocity.x = - 200;
+    bonus.body.velocity.y = - game.rnd.integerInRange(60,100);
+}
+function generateWeights(){
+    var bonus = game.add.sprite(width, height, "weights");
+    weights.push(bonus);
+    game.physics.arcade.enable(bonus);
+    bonus.body.velocity.x = - 200;
+    bonus.body.velocity.y = game.rnd.integerInRange(60,100);
+}
+function generate() {
+    var diceRoll = game.rnd.integerInRange(1, 10);
+    if(diceRoll==1) {
+        generateBalloons();
+    } else if(diceRoll==2) {
+        generateWeights();
+    } else {
+        generatePipe();
+    }
+}
     function gameOver() {
         game.destroy();
         $("#score").val(score.toString());
