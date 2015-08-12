@@ -1,0 +1,32 @@
+h1 {
+    color: darkblue;
+    font-size: 30px;
+    font-family: Montserrat;
+}
+.score {
+    color:#000000;
+}
+.gold {
+    color:gold;
+}
+#gameLink {
+    text-align: center;
+    border: 1px solid gray;
+}
+.jumbotron {
+    text-align: center;
+    border: 3px solid black;
+}
+
+#greeting {
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    background: #fff;
+    width: 350px;
+    height: 300px;
+    border: 2px solid gray;
+    border-radius: 5px;
+    padding: 20px;
+    display: none;
+}
