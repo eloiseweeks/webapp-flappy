@@ -88,6 +88,7 @@ $.get("/score", function(scores) {
     }
 
     function generatePipe() {
+        
         var gapStart = game.rnd.integerInRange(1, 5);
         for (var count = 0; count < 8; count++) {
             if (count != gapStart && count != gapStart + 1 && count != gapStart + 2) {
