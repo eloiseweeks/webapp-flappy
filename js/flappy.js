@@ -149,18 +149,16 @@ function generate() {
         gameGravity = 200;
     }
 
-function checkBonus(bonusArray, scoredifference){
+function checkBonus(bonusArray, scoredifference, lifeDifference){
     for(var i=bonusArray.length - 1; i>=0; i--){
         game.physics.arcade.overlap(player,bonusArray[i], function(){
             changeScore(scoredifference);
+            lives += lifeDifference;
+            labelLives.setText(lives.toString());
             bonusArray[i].destroy();
             bonusArray.splice(i,1);
         });
     }
-}
-function loseALife() {
-
-    labelLives.setText(lives.toString());
 }
 
     function update() {
@@ -173,12 +171,9 @@ function loseALife() {
             gameOver();
         }
         player.rotation = Math.atan(player.body.velocity.y / 200);
-        checkBonus(balloons, 3);
-        checkBonus(weights, -5);
-        if(score < 0){
-            gameOver();
-        }
-        if(lives<0) {
+        checkBonus(balloons, 3, 0);
+        checkBonus(weights, -5, -1);
+        if(lives<1) {
             gameOver();
         }
     }
